@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+
+<script src="ConvexGiftHull.js"></script>
+
+<canvas id="myCanvas" width="1200" height="500" style="border:5px solid #000000;float:left;"></canvas>
+
+<script>
+var testCheck = true;
+var pointx;
+var pointy;
+var pointsarray = [];
+var beenDone=false;
+var canvas = document.getElementById("myCanvas");
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+        y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+    };
+}
+
+document.addEventListener("mousedown", buttonPress, false)
+function buttonPress(evt){
+    var a = getMousePos(canvas, evt);
+    if (a.x<1200&&a.y<500&&testCheck==true){
+        var i = new Point(a.x, a.y);
+        pointsarray.push(i);
+        document.getElementById('txt1').innerHTML = "List of points: " + pointsarray;
+        ctx.beginPath();
+        ctx.arc(a.x,a.y,10,0,2*Math.PI);
+        ctx.fillStyle = '#000000';
+        ctx.fill();
+    }
+}
+
+
+
+function activate(){
+    if (pointsarray!=[]){
+    testCheck = false;
+    var t1 = new $convexHull(pointsarray);
+    var t2 = t1.convexHull();
+    
+    var i;
+    
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(t2[0].getX(), t2[0].getY());
+    for(let i = 1; i < t2.length; i++){
+        ctx.lineTo(t2[i].getX(), t2[i].getY());
+    }
+    ctx.closePath();
+    ctx.stroke();
+    document.getElementById('txt2').innerHTML = "Points on hull: " + t2;
+    }
+    
+}
+function erase(){
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    pointsarray=[];
+    testCheck=true;
+    document.getElementById('txt1').innerHTML = "List of points: " + pointsarray;
+    document.getElementById('txt2').innerHTML = "Points on hull:";
+}
+
+
+
+
+
+</script>
+
+<head></head>
+<body>
+<div style="float:left;padding-left:10px;">
+<div><button onclick="activate()">Compute Hull</button>
+
+<button onclick="erase()">Erase everything</button>
+
+<p>Random Points:</p>
+<div class="sliderpoints">
+    <input type="range" min="1" max="20" value="10" class="slider" id="myRange">
+    <p>Number of Points: <span id="amount"></span></p>
+</div>
+<script>
+    //code for the slider
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("amount");
+    output.innerHTML = slider.value;
+    
+    slider.oninput = function() {
+      output.innerHTML = this.value;
+    }
+    //code for the random points function, taking input from the slider
+    function randomPoints(){
+    if (testCheck==true){
+        var z = output.innerHTML; //# of random points
+        var z1;
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        
+        for (z1 = 0; z1<z; z1++){
+            
+            var i = new Point(Math.floor((Math.random() * 1200)), Math.floor((Math.random() * 500)));
+            pointsarray.push(i);
+            ctx.beginPath();
+            ctx.arc(i.x,i.y,10,0,2*Math.PI);
+            ctx.fillStyle = '#000000';
+            ctx.fill();
+            
+        }
+        document.getElementById('txt1').innerHTML = "List of points: " + pointsarray;
+        
+        
+    }
+}
+</script>
+<button onclick="randomPoints()">Draw Random Points</button></div>
+<p>Manual Input</p>
+<p>X-coordinate</p>
+<input type="form" name="X" value="" id="inputX">
+<br>
+<p>Y-coordinate</p>
+<input type="form" name="Y" value="" id="inputY">
+<br><br>
+
+<script>
+function createPoints(){
+    
+    var newX;
+    var newY;
+    newX=document.getElementById("inputX").value;
+    newY=document.getElementById("inputY").value;
+    //document.getElementById('inputX').value = '';
+    var a = new Point(newX, newY);
+    
+    
+    if (a.x<1200&&a.y<500&&testCheck==true){
+        document.getElementById('txt1').innerHTML = a;
+        var i = new Point(a.x, a.y);
+        pointsarray.push(i);
+        document.getElementById('txt1').innerHTML = "List of points: " + pointsarray;
+        ctx.beginPath();
+        ctx.arc(a.x,a.y,10,0,2*Math.PI);
+        ctx.fillStyle = '#000000';
+        ctx.fill();
+    }
+    else{
+        alert("Invalid point: x must be between 0 and 1200, y must be between 0 and 500.");
+    }
+}
+</script>
+<button onclick="createPoints()">Submit</button>
+</div>
+<div style="text-align:left;padding-top:500px;"><p id=txt1>List of points:</p><br><p id='txt2'>Points on hull:</p></div>
+<div style="padding-top:50px"></div>
+    <p align="center" style="font-size:10px;">Created by Jason Li based on code from GeeksForGeeks.com</p>
+</div>
+    
+</body>
+</html>
